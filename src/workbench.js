@@ -2,15 +2,13 @@
 import _ from 'lodash';
 import { fetch } from './ast-generator';
 import transformAST from './transform';
+import $codegen from 'escodegen';
 
-var $codegen = require('escodegen');
+// generate the test file
+const ast = fetch('./java/Test.java');
+const transformed = transformAST( ast );
+const options = { format: { indent: { style: '  ' }}};
+const generated = $codegen.generate( transformed, options );
 
-
-const ast = fetch('./java/Basic.java');
-
-
-const transformed = transformAST(ast);
-
-console.log(JSON.stringify(transformed, null, 2));
-
-console.log($codegen.generate(transformed));
+// export
+console.log( generated );

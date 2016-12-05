@@ -39,7 +39,10 @@ export function fetch( path, allowCache ) {
   const ast = $parser.parse(contents);
 
   // save the cached version
-  $fs.writeFileSync(cached, JSON.stringify(ast, null, 2));
+  if ( allowCache ) {
+    const output = JSON.stringify( ast, null, 2 )
+    $fs.writeFileSync( cached, output );
+  }
 
   return ast;
 }

@@ -37,3 +37,81 @@ should handle simple method arguments:
       add(a, b) {
       }
     }
+
+
+should handle binary operator:
+  input: >
+    class Test {
+      void test() {
+        int a = 10 + 10;
+        int b = 10 - 10;
+        int c = 10 / 10;
+        int d = 10 * 10;
+        int e = 10 + 10 + 10;
+        int f = 10 - 10 - 10;
+        int g = 10 / 10 / 10;
+        int h = 10 * 10 * 10;
+      }
+    }
+
+  output: >
+    class Test {
+      test() {
+        var a = 10 + 10;
+        var b = 10 - 10;
+        var c = 10 / 10;
+        var d = 10 * 10;
+        var e = 10 + 10 + 10;
+        var f = 10 - 10 - 10;
+        var g = 10 / 10 / 10;
+        var h = 10 * 10 * 10;
+      }
+    }
+
+
+should respect parens with expressions:
+  input: >
+    class Test {
+      void test() {
+        int a = (10 + 10) + 10;
+        int b = (10 + 10) / 10;
+        int c = 10 + (10 + 10);
+        int d = 10 / (10 + 10);
+      }
+    }
+
+  output: >
+    class Test {
+      test() {
+        var a = 10 + 10 + 10;
+        var b = (10 + 10) / 10;
+        var c = 10 + (10 + 10);
+        var d = 10 / (10 + 10);
+      }
+    }
+
+
+should invoke instance and static object methods:
+
+  input: >
+    public class Test {
+
+      public void methodA() {
+        this.testB();
+      }
+
+      public void methodB() {
+        Test.run();
+      }
+
+    }
+
+  output: >
+    class Test {
+      methodA() {
+        this.testB();
+      }
+      methodB() {
+        Test.run();
+      }
+    }
