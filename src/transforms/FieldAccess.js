@@ -3,10 +3,10 @@ import transformAST from '../transform';
 
 export default function FieldAccess( node ) {
   return {
-    type: "MemberExpression",
+    type: 'MemberExpression',
     computed: false,
     object: {
-      type: "ThisExpression"
+      type: 'ThisExpression'
     },
     property: transformAST( node.name )
   };

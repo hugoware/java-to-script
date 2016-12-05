@@ -1,41 +1,17 @@
 public class ArtSet extends ArrayList {
-  // // HashMap map;
-  // public ArtSet(int a, boolean c) {
-  //   super(10, 10);
-  // }
-  
-  public ArtSet()
+
+  public Object add(int index, Object art)
   {
-    this.map = new HashMap();
+
+    if (((art instanceof Art)) && 
+      (this.map.get(art) == null) && 
+      (super.add(index, art) != null))
+    {
+      this.map.put(art, art);
+      return art;
+    }
+    return null;
   }
-  
-  // public ArtSet(ExtendedList artObjects)
-  // {
-  //   this();
-  //   addAll(artObjects);
-  // }
-  
-  // public ArtSet(Object[] artObjects)
-  // {
-  //   this(Lists.asList(artObjects));
-  // }
-  
-  // public Art getArt(int index)
-  // {
-  //   return (Art)get(index);
-  // }
-  
-  // public Object add(int index, Object art)
-  // {
-  //   if (((art instanceof Art)) && 
-  //     (this.map.get(art) == null) && 
-  //     (super.add(index, art) != null))
-  //   {
-  //     this.map.put(art, art);
-  //     return art;
-  //   }
-  //   return null;
-  // }
   
   // public Object remove(int index)
   // {

@@ -12,7 +12,7 @@ export default function MethodDeclaration( node ) {
   const isConstructor = !!node['constructor']
 
   return {
-    type: "MethodDefinition",
+    type: 'MethodDefinition',
     key: transformAST( isConstructor ? asConstructor : node.name ),
     computed: false,
     value: {
@@ -22,11 +22,11 @@ export default function MethodDeclaration( node ) {
       expression: false,
       params: transformAST( node.parameters ),
       body: {
-        type: "BlockStatement",
+        type: 'BlockStatement',
         body: transformAST( node.body.statements )
       }
     },
-    kind: "method",
+    kind: 'method',
     static: isStatic
   };
 
