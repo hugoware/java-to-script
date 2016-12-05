@@ -1,0 +1,39 @@
+
+suite: Basic Test Cases
+
+should generate a simple class:
+  input: >
+    class Test {
+    }
+
+  output: >
+    class Test {
+    }
+
+
+should generate simple instance methods:
+  input: >
+    class Test {
+      public void test() {
+      }
+    }
+
+  output: >
+    class Test {
+      test() {
+      }
+    }
+
+
+should handle simple method arguments:
+  input: >
+    class Test {
+      public void add(int a, int b) {
+      }
+    }
+
+  output: >
+    class Test {
+      add(a, b) {
+      }
+    }

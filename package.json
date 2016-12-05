@@ -1,0 +1,19 @@
+{
+  "name": "java-to-script",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --compilers js:babel-core/register ./tests",
+    "test-watch": "nodemon -x \"npm run test\" -w ./src -w ./java -w ./tests -e js,java,yml",
+    "compile": "babel src --out-dir dist",
+    "dev": "nodemon -x \"babel-node ./src/workbench.js\" -w ./src -w ./java -e js,java"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "escodegen": "^1.8.1",
+    "java-parser": "0.0.2",
+    "lodash": "^4.17.2"
+  }
+}
