@@ -1,13 +1,19 @@
 
 import transformAST, { hasModifier } from '../transform';
 
+const asConstructor = {
+  type: 'Identifier',
+  name: 'constructor'
+}
+
 export default function MethodDeclaration( node ) {
   const isStatic = hasModifier(node, 'static');
   const isPrivate = hasModifier(node, 'public');
+  const isConstructor = !!node['constructor']
 
   return {
     type: "MethodDefinition",
-    key: transformAST( node.name ),
+    key: transformAST( isConstructor ? asConstructor : node.name ),
     computed: false,
     value: {
       type: 'FunctionExpression',

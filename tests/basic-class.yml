@@ -39,6 +39,43 @@ should handle simple method arguments:
     }
 
 
+should be able to declare many types:
+  input: >
+    public class Test {
+      public void test() {
+        int a = 10;
+        float b = 10.5f;
+        double c = 25.5d;
+        boolean e = false;
+        boolean f = true;
+        String g = "hello";
+        int[] h = { 1, 2, 3 };
+        int[] i = { this.get(1), this.get(2) };
+      }
+    }
+
+  output: >
+    class Test {
+      test() {
+        var a = 10;
+        var b = 10.5;
+        var c = 25.5;
+        var e = false;
+        var f = true;
+        var g = 'hello';
+        var h = [
+          1,
+          2,
+          3
+        ];
+        var i = [
+          this.get(1),
+          this.get(2)
+        ];
+      }
+    }
+
+
 should handle binary operator:
   input: >
     class Test {
@@ -95,23 +132,93 @@ should invoke instance and static object methods:
 
   input: >
     public class Test {
-
       public void methodA() {
-        this.testB();
+        this.run();
       }
-
       public void methodB() {
         Test.run();
       }
-
     }
 
   output: >
     class Test {
       methodA() {
-        this.testB();
+        this.run();
       }
       methodB() {
         Test.run();
+      }
+    }
+
+should instantiate objects with and without arguments:
+  input: >
+    public class Test {
+      public void test() {
+        File a = new File();
+        File b = new File(100);
+        File c = new File(100, false, 100);
+        File d = new File(100, false, new File());
+      }
+    }
+
+  output: >
+    class Test {
+      test() {
+        var a = new File();
+        var b = new File(100);
+        var c = new File(100, false, 100);
+        var d = new File(100, false, new File());
+      }
+    }
+
+
+should invoke with arguments and instantiated classes:
+  input: >
+    public class Test {
+      public void methodA() {
+        this.run(100, false, new File());
+      }
+      public void methodB() {
+        Test.run(100, false, new File());
+      }
+    }
+
+  output: >
+    class Test {
+      methodA() {
+        this.run(100, false, new File());
+      }
+      methodB() {
+        Test.run(100, false, new File());
+      }
+    }
+
+
+# should ignore field values:
+#   input: >
+#     public class Test {
+#       Test test;
+#     }
+
+#   output: >
+#     class Test {
+#     }
+
+should allow assigning to instance properties:
+  input: >
+    class Test {
+      public void test() {
+        this.a = 10;
+        this.b = new TypeB();
+        this.c = new TypeC(10, false);
+      }
+    }
+
+  output: >
+    class Test {
+      test() {
+        this.a = 10;
+        this.b = new TypeB();
+        this.c = new TypeC(10, false);
       }
     }

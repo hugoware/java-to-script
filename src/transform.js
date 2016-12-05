@@ -5,6 +5,7 @@ import transforms from './transforms';
 
 // converts a Java AST to a JavaScript friendly format
 export default function transformAST( node ) {
+  if (_.isNull( node ) || _.isUndefined( node )) return null;
   if (_.isString(node)) return node;
   if (_.isArray(node)) return _.compact(_.map(node, transformAST));
   const transform = transforms[ node.node ];
