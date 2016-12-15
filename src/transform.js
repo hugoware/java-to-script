@@ -23,3 +23,28 @@ function applyTransformation( action, node ) {
 export function hasModifier( node, find ) {
   return _.filter( node.modifiers, { node: 'Modifier', keyword: find }).length > 0;
 }
+
+export function generateBlock( body ) {
+  return {
+    type: 'BlockStatement',
+    body: body
+  };
+}
+
+export function generateThrow( message ) {
+  return {
+    type: "ThrowStatement",
+    argument: {
+      type: "Literal",
+      value: message,
+      raw: `'${ escape( message ) }'`
+    }
+  }
+}
+
+export function generateSequenceExpression( items ) {
+  return {
+    type: 'SequenceExpression',
+    expressions: transformAST( items )
+  };
+}

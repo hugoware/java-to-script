@@ -1,17 +1,23 @@
 public class ArtSet extends ArrayList {
-
-  public Object add(int index, Object art)
-  {
-
-    if (((art instanceof Art)) && 
-      (this.map.get(art) == null) && 
-      (super.add(index, art) != null))
-    {
-      this.map.put(art, art);
-      return art;
+  public void add() {
+    for ( null; null; null ) {
     }
-    return null;
   }
+
+  // public Object add(int index, Object art)
+  // {
+  //   // boolean a = m instanceof b;
+  //   super.add(45);
+
+  //   if (((art instanceof Art)) && 
+  //     (this.map.get(art) == null) && 
+  //     (super.add(index, art) != null))
+  //   {
+  //     this.map.put(art, art);
+  //     return art;
+  //   }
+  //   return null;
+  // }
   
   // public Object remove(int index)
   // {
@@ -33,7 +39,9 @@ public class ArtSet extends ArrayList {
   
   // public Raster rasterize(int type, float resolution, int antialiasing)
   // {
-  //   return rasterize(type, resolution, antialiasing, -1.0F, -1.0F);
+  //   m++;
+  //   ++m;
+  //   return rasterize(type, resolution, antialiasing); //, -1.0F, -1.0F);
   // }
   
   // public Raster rasterize(int type)

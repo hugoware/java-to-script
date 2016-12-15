@@ -1,5 +1,5 @@
 
-import transformAST, { hasModifier } from '../transform';
+import transformAST, { hasModifier, generateBlock, generateThrow } from '../transform';
 
 const asConstructor = {
   type: 'Identifier',
@@ -9,8 +9,17 @@ const asConstructor = {
 export default function MethodDeclaration( node ) {
   const isStatic = hasModifier(node, 'static');
   const isPrivate = hasModifier(node, 'public');
-  const isConstructor = !!node['constructor']
+  const isNative = hasModifier(node, 'native');
+  const isConstructor = !!node['constructor'];
 
+  // native functions don't have a body
+  if ( isNative ) {
+    node.body = generateBlock([
+      generateThrow( 'not implemented' )
+    ]);
+  };
+
+  // generate the method
   return {
     type: 'MethodDefinition',
     key: transformAST( isConstructor ? asConstructor : node.name ),
@@ -21,10 +30,7 @@ export default function MethodDeclaration( node ) {
       generator: false,
       expression: false,
       params: transformAST( node.parameters ),
-      body: {
-        type: 'BlockStatement',
-        body: transformAST( node.body.statements )
-      }
+      body: transformAST( node.body )
     },
     kind: 'method',
     static: isStatic
