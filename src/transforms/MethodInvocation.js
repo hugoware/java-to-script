@@ -1,5 +1,5 @@
 
-import transformAST from '../transform';
+import transformAST, { generateThisExpression } from '../transform';
 
 export default function MethodInvocation( node ) {
   return {
@@ -7,10 +7,9 @@ export default function MethodInvocation( node ) {
     callee: {
       type: 'MemberExpression',
       computed: false,
-      object: transformAST( node.expression || { type: 'ThisExpression' } ),
+      object: transformAST( node.expression ) || generateThisExpression(),
       property: transformAST( node.name ),
     },
     'arguments': transformAST( node.arguments )
   };
-
 }

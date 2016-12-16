@@ -1,4 +1,6 @@
 
+import { generateThisExpression } from '../transform';
+
 // no concept available in javascript
 export default function ConstructorInvocation( node ) {
   return {
@@ -11,9 +13,7 @@ export default function ConstructorInvocation( node ) {
         object: {
             type: 'MemberExpression',
             computed: false,
-            object: {
-                type: 'ThisExpression'
-            },
+            object: generateThisExpression(),
             property: {
                 type: 'Identifier',
                 name: 'constructor'
@@ -25,7 +25,7 @@ export default function ConstructorInvocation( node ) {
         }
       },
       'arguments': [
-        { type: 'ThisExpression' },
+        generateThisExpression(),
         {
             type: 'Identifier',
             name: 'arguments'

@@ -1,5 +1,5 @@
 
-import transformAST from '../transform';
+import transformAST, { attachComment } from '../transform';
 
 export default function ClassInstanceCreation( node ) {
   return {

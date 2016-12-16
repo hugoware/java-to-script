@@ -19,6 +19,7 @@ _.each( files, ( file ) => {
     exports[ key ] = require(`./${ file }`).default;
   }
   catch( e ) {
-    throw `TransformParseError: Failed to include ${ file }`;
+    throw e;
+    // throw new Error(`TransformParseError: Failed to include ${ file }:`, e );
   }
 });

@@ -1,6 +1,14 @@
 
-import transformAST from '../transform';
+import transformAST, { attachComment } from '../transform';
 
 export default function SingleVariableDeclaration( node ) {
-  return transformAST( node.name );
+  if ( node.varargs ) {
+    return {
+      type: 'RestElement', 
+      argument: transformAST( node.name )
+    };
+  }
+  else {
+    return transformAST( node.name );
+  }
 }
