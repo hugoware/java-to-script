@@ -1,820 +1,561 @@
 /*
- * Scriptographer
+ * Copyright 1998-2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This file is part of Scriptographer, a Scripting Plugin for Adobe Illustrator
- * http://scriptographer.org/
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the LICENSE file that accompanied this code.
  *
- * Copyright (c) 2002-2010, Juerg Lehni
- * http://scratchdisk.com/
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
  *
- * All rights reserved. See LICENSE file for details.
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * File created on 03.12.2004.
+ * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ * CA 95054 USA or visit www.sun.com if you need additional information or
+ * have any questions.
  */
 
-package com.scriptographer.ai;
+package sun.awt.geom;
 
-import java.awt.geom.GeneralPath;
+import java.util.Vector;
+import java.util.Enumeration;
+import java.util.Comparator;
+import java.util.Arrays;
 
-import com.scratchdisk.list.ExtendedArrayList;
-import com.scratchdisk.list.ExtendedList;
-import com.scratchdisk.list.List;
-import com.scratchdisk.list.Lists;
-import com.scratchdisk.list.ReadOnlyList;
-import com.scriptographer.CommitManager;
+public abstract class AreaOp {
+    public static abstract class CAGOp extends AreaOp {
+        boolean inLeft;
+        boolean inRight;
+        boolean inResult;
 
-/**
- * The Path item represents a path in an Illustrator document.
- * 
- * @author lehni
- * 
- * @jsreference {@type constructor} {@name Path.Line} {@reference Document#createLine} {@after Path}
- * @jsreference {@type constructor} {@name Path.Rectangle} {@reference Document#createRectangle} {@after Path}
- * @jsreference {@type constructor} {@name Path.RoundRectangle} {@reference Document#createRoundRectangle} {@after Path}
- * @jsreference {@type constructor} {@name Path.RegularPolygon} {@reference Document#createRegularPolygon} {@after Path}
- * @jsreference {@type constructor} {@name Path.Star} {@reference Document#createStar} {@after Path}
- * @jsreference {@type constructor} {@name Path.Spiral} {@reference Document#createSpiral} {@after Path}
- * @jsreference {@type constructor} {@name Path.Oval} {@reference Document#createOval} {@after Path}
- * @jsreference {@type constructor} {@name Path.Circle} {@reference Document#createCircle} {@after Path}
- * @jsreference {@type constructor} {@name Path.Arc} {@reference Document#createArc} {@after Path}
- */
-
-public class Path extends PathItem {
-
-  private SegmentList segments = null;
-  private CurveList curves = null;
-
-  /**
-   * Wraps an AIArtHandle in a Path object
-   */
-  protected Path(int handle, int docHandle, boolean created) {
-    super(handle, docHandle, created);
-  }
-
-  /**
-   * Creates a path object of the given type. Used by CompoundPath
-   */
-  protected Path(short type) {
-    super(type);
-  }
-
-  public Path() {
-    super(TYPE_PATH);
-  }
-
-  /**
-   * Creates a new Path Item.
-   * 
-   * Sample code:
-   * <code>
-   * var firstSegment = new Segment(30, 30);
-   * var secondSegment = new Segment(100, 100);
-   * var path = new Path([firstSegment, secondSegment]);
-   * </code>
-   * 
-   * <code>
-   * var path = new Path();
-   * path.moveTo(30, 30);
-   * path.lineTo(100, 100);
-   * </code>
-   * 
-   * @param segments the segments to be added to the {@link #getSegments()} array
-   * @return the newly created path
-   */
-  public Path(ReadOnlyList<? extends Segment> segments) {
-    this();
-    setSegments(segments);
-  }
-
-  public Path(Segment[] segments) {
-    this(Lists.asList(segments));
-  }
-
-  /**
-   * Adds one segment to the end of the segment list of this path.
-   * 
-   * @param segment the segment or point to be added.
-   * @return the added segment. This is not necessarily the same object, e.g.
-   *         if the segment to be added already belongs to another path.
-   */
-  public Segment add(Segment segment) {
-    return getSegments().add(segment);
-  }
-
-  /**
-   * @jshide for now. TODO: Implement varargs in doclet Adds a variable amount
-   *         of segments at the end of the segment list of this path.
-   * 
-   * @return the added segments. These are not necessarily the same objects,
-   *         e.g. if the segments to be added already belongs to another path.
-   */
-  public ReadOnlyList<? extends Segment> add(Segment... segments) {
-    SegmentList segs = getSegments();
-    int start = segs.size();
-    segs.addAll(Lists.asList(segments));
-    return segs.getSubList(start, segs.size());
-  }
-
-  /**
-   * Inserts a segment at a given index in the list of this path's segments.
-   * 
-   * @param index the index at which to insert the segment.
-   * @param segment the segment or point to be inserted.
-   * @return the added segment. This is not necessarily the same object, e.g.
-   *         if the segment to be added already belongs to another path.
-   */
-  public Segment insert(int index, Segment segment) {
-    return getSegments().add(index, segment);
-  }
-
-  /**
-   * @jshide for now. TODO: Implement varargs in doclet Inserts a variable
-   *         amount of segment at a given index in the segment list of this
-   *         path.
-   * 
-   * @param index the index at which to insert the segments.
-   * 
-   * @return the added segments. These is not necessarily the same objects,
-   *         e.g. if the segments to be added already belongs to another path.
-   */
-  public ReadOnlyList<? extends Segment> insert(int index, Segment... segments) {
-    SegmentList segs = getSegments();
-    // Remember previous size so we can find out how many were really added
-    int before = segs.size();
-    segs.addAll(index, Lists.asList(segments));
-    return segs.getSubList(index, index + segs.size() - before);
-  }
-
-  public Segment remove(int index) {
-    return getSegments().remove(index);
-  }
-
-  /**
-   * @deprecated
-   */
-  public Segment remove(Segment segment) {
-    return getSegments().remove(segment);
-  }
-
-  /**
-   * @jshide for now. TODO: Implement varargs in doclet Adds a variable amount
-   *         of segments at the end of the segment list of this path.
-   * 
-   * @return the added segments. These are not necessarily the same objects,
-   *         e.g. if the segments to be added already belongs to another path.
-   */
-  public ReadOnlyList<? extends Segment> remove(Segment... segments) {
-    SegmentList segs = getSegments();
-    ExtendedArrayList<Segment> removed = new ExtendedArrayList<Segment>(segments);
-    removed.retainAll(segs);
-    if (segs.removeAll(Lists.asList(segments)))
-      return removed;
-    return null;
-  }
-
-  public ReadOnlyList<? extends Segment> remove(int fromIndex, int toIndex) {
-    SegmentList segs = getSegments();
-    ReadOnlyList<? extends Segment> removed = segs.getSubList(fromIndex, toIndex);
-    segs.remove(fromIndex, toIndex);
-    return removed;
-  }
-
-  /**
-   * Removes the path item from the document.
-   */
-  public boolean remove() {
-    boolean ret = super.remove();
-    // Dereference from path if they're used somewhere else!
-    if (segments != null)
-      segments.path = null;
-    return ret;
-  }
-  
-  public Object clone() {
-    CommitManager.commit(this);
-    return super.clone();
-  }
-
-  /**
-   * The segments contained within the path.
-   */
-  public SegmentList getSegments() {
-    if (segments == null)
-      segments = new SegmentList(this);
-    else
-      segments.update();
-    return segments;
-  }
-
-  public void setSegments(ReadOnlyList<? extends Segment> segments) {
-    SegmentList segs = getSegments();
-    // TODO: Implement SegmentList.setAll so removeAll is not necessary and
-    // nativeCommit is used instead of nativeInsert removeRange would still
-    // be needed in cases the new list is smaller than the old one...
-    segs.removeAll();
-    segs.addAll(segments);
-  }
-
-  public void setSegments(Segment[] segments) {
-    setSegments(Lists.asList(segments));
-  }
-  
-  private void updateSize(int size) {
-    // Increase version as all segments have changed
-    version++;
-    if (segments != null)
-      segments.updateSize(size);
-    
-  }
-
-  /**
-   * The curves contained within the path.
-   */
-  public CurveList getCurves() {
-    if (curves == null)
-      curves = new CurveList(this, getSegments());
-    return curves;
-  }
-
-  public Segment getFirstSegment() {
-    return segments.getFirst();
-  }
-
-  public Segment getLastSegment() {
-    return segments.getLast();
-  }
-
-  public Curve getFirstCurve() {
-    return getCurves().getFirst();
-  }
-
-  public Curve getLastCurve() {
-    return getCurves().getLast();
-  }
-
-  /**
-   * Specifies whether the path is closed. If it is closed, Illustrator
-   * connects the first and last segments.
-   */
-  public native boolean isClosed();
-  
-  private native void nativeSetClosed(boolean closed);
-  
-  public void setClosed(boolean closed) {
-    // Amount of curves may change when closed is modified
-    nativeSetClosed(closed);
-    if (curves != null)
-      curves.updateSize();
-  }
-  
-  /**
-   * Specifies whether the path is used as a guide.
-   */
-  public native boolean isGuide();
-  
-  public native void setGuide(boolean guide);
-
-  /**
-   * The length of the perimeter of the path.
-   */
-  public native double getLength();
-
-  /**
-   * The area of the path in square points. Self-intersecting paths can
-   * contain sub-areas that cancel each other out.
-   */
-  public native float getArea();
-
-  private native void nativeReverse();
-
-  /**
-   * Reverses the segments of the path.
-   */
-  public void reverse() {
-    // First save all changes:
-    CommitManager.commit(this);
-    // Reverse underlying AI structures:
-    nativeReverse();
-    // Increase version as all segments have changed
-    version++;
-  }
-
-  private native int nativePointsToCurves(float tolerance, float threshold,
-      int cornerRadius, float scale);
-
-  /**
-   * Approximates the path by converting the points in the path to curves. It
-   * only uses the {@link Segment#getPoint()} property of each segment and
-   * ignores the {@link Segment#getHandleIn()} and
-   * {@link Segment#getHandleOut()} properties.
-   * 
-   * @param tolerance a smaller tolerance gives a more exact fit and more
-   *        segments, a larger tolerance gives a less exact fit and fewer
-   *        segments. {@default 2.5}
-   * @param threshold {@default 1}
-   * @param cornerRadius if, at any point in the fitted curve, the radius of
-   *        an inscribed circle that has the same tangent and curvature is
-   *        less than the cornerRadius, a corner point is generated there;
-   *        otherwise the path is smooth at that point. {@default 1}
-   * @param scale the scale factor by which the points and other input units
-   *        (such as the corner radius) are multiplied. {@default 1}
-   */
-  public void pointsToCurves(float tolerance, float threshold,
-      int cornerRadius, float scale) {
-    updateSize(nativePointsToCurves(tolerance, threshold, cornerRadius,
-        scale));
-  }
-
-  public void pointsToCurves(float tolerance, float threshold,
-      int cornerRadius) {
-    pointsToCurves(tolerance, threshold, cornerRadius, 1f);
-  }
-
-  public void pointsToCurves(float tolerance, float threshold) {
-    pointsToCurves(tolerance, threshold, 1, 1f);
-  }
-
-  public void pointsToCurves(float tolerance) {
-    pointsToCurves(tolerance, 1f, 1, 1f);
-  }
-
-  public void pointsToCurves() {
-    pointsToCurves(2.5f, 1f, 1, 1f);
-  }
-
-  private native int nativeCurvesToPoints(float maxPointDistance,
-      float flatness);
-
-  /**
-   * Converts the curves in the path to points.
-   * 
-   * @param maxPointDistance the maximum distance between the generated points
-   *        {@default 1000}
-   * @param flatness a value which controls the exactness of the algorithm
-   *        {@default 0.1}
-   */
-  public void curvesToPoints(double maxPointDistance, double flatness) {
-    int size = nativeCurvesToPoints((float) maxPointDistance, (float) flatness);
-    updateSize(size);
-  }
-
-  public void curvesToPoints(double maxPointDistance) {
-    curvesToPoints(maxPointDistance, 0.1f);
-  }
-
-  public void curvesToPoints() {
-    curvesToPoints(1000f, 0.1f);
-  }
-
-  private native void nativeReduceSegments(float flatness);
-
-  /**
-   * Reduces the amount of segments in the path.
-   * 
-   * @param flatness a value which controls the exactness of the algorithm
-   *        {@default 0.1}
-   */
-  public void reduceSegments(double flatness) {
-    nativeReduceSegments((float) flatness);
-    updateSize(-1);
-  }
-
-  public void reduceSegments() {
-    reduceSegments(0.1f);
-  }
-  
-  public Path split(double offset) {
-    return split(getLocation(offset));
-  }
-
-  public Path split(CurveLocation location) {
-    return location != null ? split(location.getIndex(),
-        location.getParameter()) : null;
-  }
-
-  public Path split(int index, double parameter) {
-    if (parameter < 0.0) parameter = 0.0;
-    else if (parameter >= 1.0) {
-      // t = 1 is the same as t = 0 and index ++
-      index++;
-      parameter = 0.0;
-    }
-    SegmentList segments = getSegments();
-    CurveList curves = getCurves();
-    if (index >= 0 && index < curves.size()) {
-      boolean hasTabletData = hasTabletData();
-      // If there is tablet data, we need to measure the offset of
-      // the split point, as a value between 0 and 1
-      double length, partLength;
-      if (hasTabletData) {
-        length = getLength();
-        // Add up length of the new path by getting the curves lengths
-        partLength = 0;
-        for (int i = 0; i < index; i++)
-          partLength += curves.get(i).getLength();
-      } else {
-        length = partLength = 0;
-      }
-      // Only divide curves if we're not on an existing segment already
-      if (parameter > 0.0) {
-        // Divide the curve with the index at given parameter
-        Curve curve = curves.get(index);
-        curve.divide(parameter);
-        if (hasTabletData)
-          partLength += curve.getLength();
-        // Dividing adds more segments to the path
-        index++;
-      }
-      // Create the new path with the segments to the right of given parameter
-      ExtendedList<Segment> newSegments = segments.getSubList(index, segments.size());
-      // If the path was closed, make it an open one and move the segments around,
-      // instead of creating a new path. Otherwise create two paths.
-      if (isClosed()) {
-        // Changing an item's segments also seems to change user attributes,
-        // i.e. selection state, so save them and restore them again.
-        int attributes = getAttributes();
-        newSegments.addAll(segments.getSubList(0, index + 1));
-        setSegments(newSegments);
-        setClosed(false);
-        setAttributes(attributes);
-        if (hasTabletData)
-          nativeSwapTabletData(partLength / length);
-        return this;
-      } else if (index > 0) {
-        // Delete the segments from the current path, not including the divided point
-        segments.remove(index + 1, segments.size());
-        // TODO: Instead of cloning, find a way to copy all necessary attributes over?
-        // AIArtSuite::TransferAttributes?
-        // TODO: Split TabletData arrays as well! kTransferLivePaintPathTags?
-        Path newPath = (Path) clone();
-        newPath.setSegments(newSegments);
-        nativeSplitTabletData(partLength / length, newPath);
-        return newPath;
-      }
-    }
-    return null;
-  }
-
-  public Path split(int index) {
-    return split(index, 0);
-  }
-
-  public Path split(Point point) {
-    return split(getLocation(point));
-  }
-
-  public boolean join(Path path) {
-    if (path != null) {
-      SegmentList segments1 = getSegments();
-      SegmentList segments2 = path.getSegments();
-      Segment last1 = segments1.getLast();
-      Segment last2 = segments2.getLast();
-      if (last1.point.equals(last2.point)) {
-        path.reverse();
-      }
-      Segment first2 = segments2.getFirst();
-      if (last1.point.equals(first2.point)) {
-        last1.handleOut.set(first2.handleOut);
-        segments1.addAll(segments2.getSubList(1, segments2.size()));
-      } else {
-        Segment first1 = segments1.getFirst();
-        if (first1.point.equals(first2.point)) {
-          path.reverse();
+        public void newRow() {
+            inLeft = false;
+            inRight = false;
+            inResult = false;
         }
-        last2 = segments2.getLast();
-        if (first1.point.equals(last2.point)) {
-          first1.handleIn.set(last2.handleIn);
-          // Prepend all segments from segments2 except last one
-          segments1.addAll(0, segments2.getSubList(0, segments2.size() - 1));
+
+        public int classify(Edge e) {
+            if (e.getCurveTag() == CTAG_LEFT) {
+                inLeft = !inLeft;
+            } else {
+                inRight = !inRight;
+            }
+            boolean newClass = newClassification(inLeft, inRight);
+            if (inResult == newClass) {
+                return ETAG_IGNORE;
+            }
+            inResult = newClass;
+            return (newClass ? ETAG_ENTER : ETAG_EXIT);
+        }
+
+        public int getState() {
+            return (inResult ? RSTAG_INSIDE : RSTAG_OUTSIDE);
+        }
+
+        public abstract boolean newClassification(boolean inLeft,
+                                                  boolean inRight);
+    }
+
+    public static class AddOp extends CAGOp {
+        public boolean newClassification(boolean inLeft, boolean inRight) {
+            return (inLeft || inRight);
+        }
+    }
+
+    public static class SubOp extends CAGOp {
+        public boolean newClassification(boolean inLeft, boolean inRight) {
+            return (inLeft && !inRight);
+        }
+    }
+
+    public static class IntOp extends CAGOp {
+        public boolean newClassification(boolean inLeft, boolean inRight) {
+            return (inLeft && inRight);
+        }
+    }
+
+    public static class XorOp extends CAGOp {
+        public boolean newClassification(boolean inLeft, boolean inRight) {
+            return (inLeft != inRight);
+        }
+    }
+
+    public static class NZWindOp extends AreaOp {
+        private int count;
+
+        public void newRow() {
+            count = 0;
+        }
+
+        public int classify(Edge e) {
+            // Note: the right curves should be an empty set with this op...
+            // assert(e.getCurveTag() == CTAG_LEFT);
+            int newCount = count;
+            int type = (newCount == 0 ? ETAG_ENTER : ETAG_IGNORE);
+            newCount += e.getCurve().getDirection();
+            count = newCount;
+            return (newCount == 0 ? ETAG_EXIT : type);
+        }
+
+        public int getState() {
+            return ((count == 0) ? RSTAG_OUTSIDE : RSTAG_INSIDE);
+        }
+    }
+
+    public static class EOWindOp extends AreaOp {
+        private boolean inside;
+
+        public void newRow() {
+            inside = false;
+        }
+
+        public int classify(Edge e) {
+            // Note: the right curves should be an empty set with this op...
+            // assert(e.getCurveTag() == CTAG_LEFT);
+            boolean newInside = !inside;
+            inside = newInside;
+            return (newInside ? ETAG_ENTER : ETAG_EXIT);
+        }
+
+        public int getState() {
+            return (inside ? RSTAG_INSIDE : RSTAG_OUTSIDE);
+        }
+    }
+
+    private AreaOp() {
+    }
+
+    /* Constants to tag the left and right curves in the edge list */
+    public static final int CTAG_LEFT = 0;
+    public static final int CTAG_RIGHT = 1;
+
+    /* Constants to classify edges */
+    public static final int ETAG_IGNORE = 0;
+    public static final int ETAG_ENTER = 1;
+    public static final int ETAG_EXIT = -1;
+
+    /* Constants used to classify result state */
+    public static final int RSTAG_INSIDE = 1;
+    public static final int RSTAG_OUTSIDE = -1;
+
+    public abstract void newRow();
+
+    public abstract int classify(Edge e);
+
+    public abstract int getState();
+
+    public Vector calculate(Vector left, Vector right) {
+        Vector edges = new Vector();
+        addEdges(edges, left, AreaOp.CTAG_LEFT);
+        addEdges(edges, right, AreaOp.CTAG_RIGHT);
+        edges = pruneEdges(edges);
+        if (false) {
+            System.out.println("result: ");
+            int numcurves = edges.size();
+            Curve[] curvelist = (Curve[]) edges.toArray(new Curve[numcurves]);
+            for (int i = 0; i < numcurves; i++) {
+                System.out.println("curvelist["+i+"] = "+curvelist[i]);
+            }
+        }
+        return edges;
+    }
+
+    private static void addEdges(Vector edges, Vector curves, int curvetag) {
+        Enumeration enum_ = curves.elements();
+        while (enum_.hasMoreElements()) {
+            Curve c = (Curve) enum_.nextElement();
+            if (c.getOrder() > 0) {
+                edges.add(new Edge(c, curvetag));
+            }
+        }
+    }
+
+    private static Comparator YXTopComparator = new Comparator() {
+        public int compare(Object o1, Object o2) {
+            Curve c1 = ((Edge) o1).getCurve();
+            Curve c2 = ((Edge) o2).getCurve();
+            double v1, v2;
+            if ((v1 = c1.getYTop()) == (v2 = c2.getYTop())) {
+                if ((v1 = c1.getXTop()) == (v2 = c2.getXTop())) {
+                    return 0;
+                }
+            }
+            if (v1 < v2) {
+                return -1;
+            }
+            return 1;
+        }
+    };
+
+    private Vector pruneEdges(Vector edges) {
+        int numedges = edges.size();
+        if (numedges < 2) {
+            return edges;
+        }
+        Edge[] edgelist = (Edge[]) edges.toArray(new Edge[numedges]);
+        Arrays.sort(edgelist, YXTopComparator);
+        if (false) {
+            System.out.println("pruning: ");
+            for (int i = 0; i < numedges; i++) {
+                System.out.println("edgelist["+i+"] = "+edgelist[i]);
+            }
+        }
+        Edge e;
+        int left = 0;
+        int right = 0;
+        int cur = 0;
+        int next = 0;
+        double yrange[] = new double[2];
+        Vector subcurves = new Vector();
+        Vector chains = new Vector();
+        Vector links = new Vector();
+        // Active edges are between left (inclusive) and right (exclusive)
+        while (left < numedges) {
+            double y = yrange[0];
+            // Prune active edges that fall off the top of the active y range
+            for (cur = next = right - 1; cur >= left; cur--) {
+                e = edgelist[cur];
+                if (e.getCurve().getYBot() > y) {
+                    if (next > cur) {
+                        edgelist[next] = e;
+                    }
+                    next--;
+                }
+            }
+            left = next + 1;
+            // Grab a new "top of Y range" if the active edges are empty
+            if (left >= right) {
+                if (right >= numedges) {
+                    break;
+                }
+                y = edgelist[right].getCurve().getYTop();
+                if (y > yrange[0]) {
+                    finalizeSubCurves(subcurves, chains);
+                }
+                yrange[0] = y;
+            }
+            // Incorporate new active edges that enter the active y range
+            while (right < numedges) {
+                e = edgelist[right];
+                if (e.getCurve().getYTop() > y) {
+                    break;
+                }
+                right++;
+            }
+            // Sort the current active edges by their X values and
+            // determine the maximum valid Y range where the X ordering
+            // is correct
+            yrange[1] = edgelist[left].getCurve().getYBot();
+            if (right < numedges) {
+                y = edgelist[right].getCurve().getYTop();
+                if (yrange[1] > y) {
+                    yrange[1] = y;
+                }
+            }
+            if (false) {
+                System.out.println("current line: y = ["+
+                                   yrange[0]+", "+yrange[1]+"]");
+                for (cur = left; cur < right; cur++) {
+                    System.out.println("  "+edgelist[cur]);
+                }
+            }
+            // Note: We could start at left+1, but we need to make
+            // sure that edgelist[left] has its equivalence set to 0.
+            int nexteq = 1;
+            for (cur = left; cur < right; cur++) {
+                e = edgelist[cur];
+                e.setEquivalence(0);
+                for (next = cur; next > left; next--) {
+                    Edge prevedge = edgelist[next-1];
+                    int ordering = e.compareTo(prevedge, yrange);
+                    if (yrange[1] <= yrange[0]) {
+                        throw new InternalError("backstepping to "+yrange[1]+
+                                                " from "+yrange[0]);
+                    }
+                    if (ordering >= 0) {
+                        if (ordering == 0) {
+                            // If the curves are equal, mark them to be
+                            // deleted later if they cancel each other
+                            // out so that we avoid having extraneous
+                            // curve segments.
+                            int eq = prevedge.getEquivalence();
+                            if (eq == 0) {
+                                eq = nexteq++;
+                                prevedge.setEquivalence(eq);
+                            }
+                            e.setEquivalence(eq);
+                        }
+                        break;
+                    }
+                    edgelist[next] = prevedge;
+                }
+                edgelist[next] = e;
+            }
+            if (false) {
+                System.out.println("current sorted line: y = ["+
+                                   yrange[0]+", "+yrange[1]+"]");
+                for (cur = left; cur < right; cur++) {
+                    System.out.println("  "+edgelist[cur]);
+                }
+            }
+            // Now prune the active edge list.
+            // For each edge in the list, determine its classification
+            // (entering shape, exiting shape, ignore - no change) and
+            // record the current Y range and its classification in the
+            // Edge object for use later in constructing the new outline.
+            newRow();
+            double ystart = yrange[0];
+            double yend = yrange[1];
+            for (cur = left; cur < right; cur++) {
+                e = edgelist[cur];
+                int etag;
+                int eq = e.getEquivalence();
+                if (eq != 0) {
+                    // Find one of the segments in the "equal" range
+                    // with the right transition state and prefer an
+                    // edge that was either active up until ystart
+                    // or the edge that extends the furthest downward
+                    // (i.e. has the most potential for continuation)
+                    int origstate = getState();
+                    etag = (origstate == AreaOp.RSTAG_INSIDE
+                            ? AreaOp.ETAG_EXIT
+                            : AreaOp.ETAG_ENTER);
+                    Edge activematch = null;
+                    Edge longestmatch = e;
+                    double furthesty = yend;
+                    do {
+                        // Note: classify() must be called
+                        // on every edge we consume here.
+                        classify(e);
+                        if (activematch == null &&
+                            e.isActiveFor(ystart, etag))
+                        {
+                            activematch = e;
+                        }
+                        y = e.getCurve().getYBot();
+                        if (y > furthesty) {
+                            longestmatch = e;
+                            furthesty = y;
+                        }
+                    } while (++cur < right &&
+                             (e = edgelist[cur]).getEquivalence() == eq);
+                    --cur;
+                    if (getState() == origstate) {
+                        etag = AreaOp.ETAG_IGNORE;
+                    } else {
+                        e = (activematch != null ? activematch : longestmatch);
+                    }
+                } else {
+                    etag = classify(e);
+                }
+                if (etag != AreaOp.ETAG_IGNORE) {
+                    e.record(yend, etag);
+                    links.add(new CurveLink(e.getCurve(), ystart, yend, etag));
+                }
+            }
+            // assert(getState() == AreaOp.RSTAG_OUTSIDE);
+            if (getState() != AreaOp.RSTAG_OUTSIDE) {
+                System.out.println("Still inside at end of active edge list!");
+                System.out.println("num curves = "+(right-left));
+                System.out.println("num links = "+links.size());
+                System.out.println("y top = "+yrange[0]);
+                if (right < numedges) {
+                    System.out.println("y top of next curve = "+
+                                       edgelist[right].getCurve().getYTop());
+                } else {
+                    System.out.println("no more curves");
+                }
+                for (cur = left; cur < right; cur++) {
+                    e = edgelist[cur];
+                    System.out.println(e);
+                    int eq = e.getEquivalence();
+                    if (eq != 0) {
+                        System.out.println("  was equal to "+eq+"...");
+                    }
+                }
+            }
+            if (false) {
+                System.out.println("new links:");
+                for (int i = 0; i < links.size(); i++) {
+                    CurveLink link = (CurveLink) links.elementAt(i);
+                    System.out.println("  "+link.getSubCurve());
+                }
+            }
+            resolveLinks(subcurves, chains, links);
+            links.clear();
+            // Finally capture the bottom of the valid Y range as the top
+            // of the next Y range.
+            yrange[0] = yend;
+        }
+        finalizeSubCurves(subcurves, chains);
+        Vector ret = new Vector();
+        Enumeration enum_ = subcurves.elements();
+        while (enum_.hasMoreElements()) {
+            CurveLink link = (CurveLink) enum_.nextElement();
+            ret.add(link.getMoveto());
+            CurveLink nextlink = link;
+            while ((nextlink = nextlink.getNext()) != null) {
+                if (!link.absorb(nextlink)) {
+                    ret.add(link.getSubCurve());
+                    link = nextlink;
+                }
+            }
+            ret.add(link.getSubCurve());
+        }
+        return ret;
+    }
+
+    public static void finalizeSubCurves(Vector subcurves, Vector chains) {
+        int numchains = chains.size();
+        if (numchains == 0) {
+            return;
+        }
+        if ((numchains & 1) != 0) {
+            throw new InternalError("Odd number of chains!");
+        }
+        ChainEnd[] endlist = new ChainEnd[numchains];
+        chains.toArray(endlist);
+        for (int i = 1; i < numchains; i += 2) {
+            ChainEnd open = endlist[i - 1];
+            ChainEnd close = endlist[i];
+            CurveLink subcurve = open.linkTo(close);
+            if (subcurve != null) {
+                subcurves.add(subcurve);
+            }
+        }
+        chains.clear();
+    }
+
+    private static CurveLink[] EmptyLinkList = new CurveLink[2];
+    private static ChainEnd[] EmptyChainList = new ChainEnd[2];
+
+    public static void resolveLinks(Vector subcurves,
+                                    Vector chains,
+                                    Vector links)
+    {
+        int numlinks = links.size();
+        CurveLink[] linklist;
+        if (numlinks == 0) {
+            linklist = EmptyLinkList;
         } else {
-          segments1.addAll(segments2);
+            if ((numlinks & 1) != 0) {
+                throw new InternalError("Odd number of new curves!");
+            }
+            linklist = new CurveLink[numlinks+2];
+            links.toArray(linklist);
         }
-      }
-      // TODO: Tablet data!
-      path.remove();
-      // Close if they touch in both places
-      Segment first1 = segments1.getFirst();
-      last1 = segments1.getLast();
-      if (last1.point.equals(first1.point)) {
-        first1.handleIn.set(last1.handleIn);
-        segments1.remove(segments1.size() - 1);
-        setClosed(true);
-      }
-      return true;
+        int numchains = chains.size();
+        ChainEnd[] endlist;
+        if (numchains == 0) {
+            endlist = EmptyChainList;
+        } else {
+            if ((numchains & 1) != 0) {
+                throw new InternalError("Odd number of chains!");
+            }
+            endlist = new ChainEnd[numchains+2];
+            chains.toArray(endlist);
+        }
+        int curchain = 0;
+        int curlink = 0;
+        chains.clear();
+        ChainEnd chain = endlist[0];
+        ChainEnd nextchain = endlist[1];
+        CurveLink link = linklist[0];
+        CurveLink nextlink = linklist[1];
+        while (chain != null || link != null) {
+            /*
+             * Strategy 1:
+             * Connect chains or links if they are the only things left...
+             */
+            boolean connectchains = (link == null);
+            boolean connectlinks = (chain == null);
+
+            if (!connectchains && !connectlinks) {
+                // assert(link != null && chain != null);
+                /*
+                 * Strategy 2:
+                 * Connect chains or links if they close off an open area...
+                 */
+                connectchains = ((curchain & 1) == 0 &&
+                                 chain.getX() == nextchain.getX());
+                connectlinks = ((curlink & 1) == 0 &&
+                                link.getX() == nextlink.getX());
+
+                if (!connectchains && !connectlinks) {
+                    /*
+                     * Strategy 3:
+                     * Connect chains or links if their successor is
+                     * between them and their potential connectee...
+                     */
+                    double cx = chain.getX();
+                    double lx = link.getX();
+                    connectchains =
+                        (nextchain != null && cx < lx &&
+                         obstructs(nextchain.getX(), lx, curchain));
+                    connectlinks =
+                        (nextlink != null && lx < cx &&
+                         obstructs(nextlink.getX(), cx, curlink));
+                }
+            }
+            if (connectchains) {
+                CurveLink subcurve = chain.linkTo(nextchain);
+                if (subcurve != null) {
+                    subcurves.add(subcurve);
+                }
+                curchain += 2;
+                chain = endlist[curchain];
+                nextchain = endlist[curchain+1];
+            }
+            if (connectlinks) {
+                ChainEnd openend = new ChainEnd(link, null);
+                ChainEnd closeend = new ChainEnd(nextlink, openend);
+                openend.setOtherEnd(closeend);
+                chains.add(openend);
+                chains.add(closeend);
+                curlink += 2;
+                link = linklist[curlink];
+                nextlink = linklist[curlink+1];
+            }
+            if (!connectchains && !connectlinks) {
+                // assert(link != null);
+                // assert(chain != null);
+                // assert(chain.getEtag() == link.getEtag());
+                chain.addLink(link);
+                chains.add(chain);
+                curchain++;
+                chain = nextchain;
+                nextchain = endlist[curchain+1];
+                curlink++;
+                link = nextlink;
+                nextlink = linklist[curlink+1];
+            }
+        }
+        if ((chains.size() & 1) != 0) {
+            System.out.println("Odd number of chains!");
+        }
     }
-    return false;
-  }
 
-  /**
-   * Smooth bezier curves without changing the amount of segments or their
-   * points, by only smoothing and adjusting their handle points, for both
-   * open ended and closed paths.
-   * 
-   * @author Oleg V. Polikarpotchkin
-   */
-  public void smooth() {
-    getSegments().smooth(isClosed());
-  }
-
-  public CurveLocation getLocation(Point point, double precision) {
-    CurveList curves = getCurves();
-    int length = curves.size();
-    
-    for (int i = 0; i < length; i++) {
-      Curve curve = curves.get(i);
-      double t = curve.getParameter(point, precision);
-      if (t >= 0)
-        return new CurveLocation(curve, t);
+    /*
+     * Does the position of the next edge at v1 "obstruct" the
+     * connectivity between current edge and the potential
+     * partner edge which is positioned at v2?
+     *
+     * Phase tells us whether we are testing for a transition
+     * into or out of the interior part of the resulting area.
+     *
+     * Require 4-connected continuity if this edge and the partner
+     * edge are both "entering into" type edges
+     * Allow 8-connected continuity for "exiting from" type edges
+     */
+    public static boolean obstructs(double v1, double v2, int phase) {
+        return (((phase & 1) == 0) ? (v1 <= v2) : (v1 < v2));
     }
-    return null;
-  }
-
-  public CurveLocation getLocation(Point point) {
-    return getLocation(point, Curve.EPSILON);
-  }
-
-  // TODO: move to CurveList, to make accessible when not using
-  // paths directly too?
-  public CurveLocation getLocation(double offset) {
-    CurveList curves = getCurves();
-    double currentLength = 0;
-    for (int i = 0, l = curves.size(); i < l; i++) {
-      double startLength = currentLength;
-      Curve curve = curves.get(i);
-      currentLength += curve.getLength();
-      if (currentLength >= offset) {
-        // found the segment within which the length lies
-        double t = curve.getParameter(offset - startLength);
-        return new CurveLocation(curve, t);
-      }
-    }
-    // it may be that through impreciseness of getLength, that the end of
-    // the curves was missed:
-    if (curves.size() > 0 && offset <= getLength()) {
-      Curve curve = curves.getLast();
-      return new CurveLocation(curve, 1);
-    }
-    return null;
-  }
-
-  /**
-   * @deprecated
-   */
-  public CurveLocation getPositionWithLength(double length) {
-    return getLocation(length);
-  }
-
-  protected Double getOffset(CurveLocation location) {
-    Integer index = location.getIndex();
-    if (index != null) {
-      double offset = 0;
-      CurveList curves = getCurves();
-      for (int i = 0; i < index; i++)
-        offset += curves.get(i).getLength();
-      Curve curve = curves.get(index);
-      return offset + curve.getLength(0, location.getParameter());
-    }
-    return null;
-  }
-
-  /**
-   * @deprecated
-   */
-  public Double getLengthOfPosition(CurveLocation location) {
-    return getOffset(location);
-  }
-
-  /**
-   * Returns the point of the path at the given offset.
-   */
-  public Point getPoint(double offset) {
-    CurveLocation loc = getLocation(offset);
-    if (loc != null)
-      return loc.getPoint();
-    return null;
-  }
-
-  /**
-   * Returns the tangential vector to the path at the given offset as a vector
-   * point.
-   */
-  public Point getTangent(double offset) {
-    CurveLocation loc = getLocation(offset);
-    if (loc != null)
-      return loc.getTangent();
-    return null;
-  }
-
-  /**
-   * Returns the normal vector to the path at the given offset as a vector
-   * point.
-   */
-  public Point getNormal(double offset) {
-    CurveLocation loc = getLocation(offset);
-    if (loc != null)
-      return loc.getNormal();
-    return null;
-  }
-
-  /*
-   * Tablet Data Stuff
-   */
-  
-  private static final int
-      /** Stylus pressure. */
-      TABLET_PRESSURE = 0,
-      /** Stylus wheel pressure, also called tangential or barrel pressure */
-      TABLET_BARREL_PRESSURE = 1,
-      /** Tilt, also called altitude. */
-      TABLET_TILT = 2,
-      /** Bearing, also called azimuth. */
-      TABLET_BEARING = 3,
-      /** Rotation. */
-      TABLET_ROTATION = 4;
-
-  private native float[][] nativeGetTabletData(int type);
-  
-  private native void nativeSetTabletData(int type, float[][] data);
-
-  private native boolean nativeSplitTabletData(double offset, Path other);
-
-  private native boolean nativeSwapTabletData(double offset);
-
-  public native boolean hasTabletData();
-
-  /**
-   * {@grouptitle Tablet Data}
-   */
-  public float[][] getTabletPressure() {
-    return nativeGetTabletData(TABLET_PRESSURE);
-  }
-
-  public void setTabletPressure(float[][] data) {
-    nativeSetTabletData(TABLET_PRESSURE, data);
-  }
-
-  public float[][] getTabletWheel() {
-    return nativeGetTabletData(TABLET_BARREL_PRESSURE);
-  }
-
-  public void setTabletWheel(float[][] data) {
-    nativeSetTabletData(TABLET_BARREL_PRESSURE, data);
-  }
-
-  public float[][] getTabletTilt() {
-    return nativeGetTabletData(TABLET_TILT);
-  }
-
-  public void setTabletTilt(float[][] data) {
-    nativeSetTabletData(TABLET_TILT, data);
-  }
-
-  public float[][] getTabletBearing() {
-    return nativeGetTabletData(TABLET_BEARING);
-  }
-
-  public void setTabletBearing(float[][] data) {
-    nativeSetTabletData(TABLET_BEARING, data);
-  }
-
-  public float[][] getTabletRotation() {
-    return nativeGetTabletData(TABLET_ROTATION);
-  }
-
-  public void setTabletRotation(float[][] data) {
-    nativeSetTabletData(TABLET_ROTATION, data);
-  }
-
-  /**
-   * @deprecated Use {@link #getTabletPressure())} instead.
-   */
-  public float[][] getTabletData() {
-    return nativeGetTabletData(TABLET_PRESSURE);
-  }
-
-  /**
-   * @deprecated Use {@link #setTabletPressure())} instead.
-   */
-  public void setTabletData(float[][] data) {
-    nativeSetTabletData(TABLET_PRESSURE, data);
-  }
-  
-  @Override
-  public void moveTo(double x, double y) {
-    getSegments().moveTo(x, y);
-  }
-  
-  @Override
-  public void lineTo(double x, double y) {
-    getSegments().lineTo(x, y);
-  }
-  
-  @Override
-  public void cubicCurveTo(double handle1X, double handle1Y, double handle2X,
-      double handle2Y, double toX, double toY) {
-    getSegments().cubicCurveTo(handle1X, handle1Y, handle2X, handle2Y,
-        toX, toY);
-  }
-
-  @Override
-  public void quadraticCurveTo(double handleX, double handleY,
-      double toX, double toY) {
-    getSegments().quadraticCurveTo(handleX, handleY, toX, toY);
-  }
-
-  @Override
-  public void curveTo(double throughX, double throughY,
-      double toX, double toY, double parameter) {
-    getSegments().curveTo(throughX, throughY, toX, toY, parameter);
-  }
-
-  @Override
-  public void arcTo(double x, double y, boolean clockwise) {
-    getSegments().arcTo(x, y, clockwise);
-  }
-
-  @Override
-  public void arcTo(double throughX, double throughY, double toX, double toY) {
-    getSegments().arcTo(throughX, throughY, toX, toY);
-  }
-
-  @Override
-  public void lineBy(double x, double y) {
-    getSegments().lineBy(x, y);
-  }
-
-  @Override
-  public void curveBy(double throughX, double throughY,
-      double toX, double toY, double parameter) {
-    getSegments().curveBy(throughX, throughY, toX, toY, parameter);
-  }
-
-  @Override
-  public void arcBy(double x, double y, boolean clockwise) {
-    getSegments().arcBy(x, y, clockwise);
-  }
-
-  @Override
-  public void arcBy(double throughX, double throughY, double toX, double toY) {
-    getSegments().arcBy(throughX, throughY, toX, toY);
-  }
-
-  @Override
-  public void closePath() {
-    setClosed(true);
-  }
-
-  /**
-   * Converts to a Java2D shape.
-   * 
-   * @jshide
-   */
-  public GeneralPath toShape() {
-    GeneralPath path = new GeneralPath();
-    SegmentList segments = getSegments();
-    Segment first = segments.getFirst();
-    path.moveTo((float) first.point.x, (float) first.point.y);
-    Segment seg = first;
-    for (int i = 1, l = segments.size(); i < l; i++) {
-      Segment next = segments.get(i);
-      addSegment(path, seg, next);
-      seg = next;
-    }
-    if (isClosed()) {
-      addSegment(path, seg, first);
-      path.closePath();
-    }
-    path.setWindingRule(getStyle().getWindingRule() == WindingRule.NON_ZERO
-        ? GeneralPath.WIND_NON_ZERO
-        : GeneralPath.WIND_EVEN_ODD);
-    return path;
-  }
-
-  private static void addSegment(GeneralPath path, Segment current,
-      Segment next) {
-    Point point1 = current.point;
-    Point handle1 = current.handleOut;
-    Point handle2 = next.handleIn;
-    Point point2 = next.point;
-    if (handle1.isZero() && handle2.isZero()) {
-      path.lineTo(
-          (float) point2.x,
-          (float) point2.y
-      );
-    } else {
-      // TODO: Is there an easy way to detect quads?
-      path.curveTo(
-          (float) (point1.x + handle1.x),
-          (float) (point1.y + handle1.y),
-          (float) (point2.x + handle2.x),
-          (float) (point2.y + handle2.y),
-          (float) point2.x,
-          (float) point2.y
-      );
-    }
-  }
-
-  protected List<Curve> getAllCurves() {
-    return getCurves();
-  }
 }

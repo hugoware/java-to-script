@@ -18,8 +18,8 @@ import $codegen from 'escodegen';
 // });
 
 
-// const path = './java/Test.java';
-const path = '/Users/hugo/Desktop/boolean/scriptographer/src/java/com/scriptographer/ai/Segment.java';
+const path = './java/Test.java';
+// const path = '/Users/hugo/Desktop/boolean/scriptographer/src/java/com/scriptographer/ai/Pathfinder.java';
 const ast = fetch( path, true );
 // console.log( JSON.stringify( ast, null, 2 ));
 const transformed = transformAST( ast );
@@ -29,7 +29,6 @@ const transformed = transformAST( ast );
 
 // export
 const options = { 
-  comment: true,
   format: {
     indent: { style: '  ' }
   }
@@ -38,7 +37,7 @@ const options = {
 // perform the generation
 try {
   const generated = $codegen.generate( transformed, options );
-  console.log( generated );
+  console.log( '\n\n', generated, '\n\n' );
 }
 catch( e ) {
   console.log('failed to render');

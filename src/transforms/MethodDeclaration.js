@@ -10,6 +10,7 @@ export default function MethodDeclaration( node ) {
   const isStatic = hasModifier( node, 'static' );
   const isPrivate = hasModifier( node, 'private' );
   const isNative = hasModifier( node, 'native' );
+  const isAbstract = hasModifier( node, 'abstract' );
   const isConstructor = !!node['constructor'];
 
   if ( isPrivate ) {
@@ -20,7 +21,12 @@ export default function MethodDeclaration( node ) {
   let body;
   if ( isNative ) {
     body = generateBlock([
-      generateThrow( 'not implemented' )
+      generateThrow( 'native: not implemented' )
+    ]);
+  }
+  else if ( isAbstract ) {
+    body = generateBlock([
+      generateThrow( 'abstract: must implement' )
     ]);
   }
   // transform the body normally

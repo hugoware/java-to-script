@@ -1,4 +1,6 @@
 
+import transformAST from '../transform';
+
 export default function TypeLiteral( node ) {
-  console.log( node );
+  return transformAST( node.type )
 }
