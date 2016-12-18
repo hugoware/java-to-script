@@ -3,6 +3,9 @@ import transformAST, { hasModifier } from '../transform';
 
 // in the absence of fields - just set a getter for the value
 export default function FieldDeclaration( node ) {
+
+  return node;
+  
   const fragment = node.fragments[ 0 ];
   const name = transformAST( fragment.name )
   const result = transformAST( fragment.initializer )

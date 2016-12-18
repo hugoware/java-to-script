@@ -3,9 +3,7 @@ import _ from 'lodash';
 import transforms from './transforms';
 
 const $listeners = { };
-let $comment;
 let $depth = -1;
-
 
 // converts a Java AST to a JavaScript friendly format
 export default function transformAST( node ) {
@@ -24,20 +22,25 @@ export default function transformAST( node ) {
   if ( _.isArray( node ))
     return _.compact( _.map( node, transformAST ));
 
+  // get the transform type
+  const type = node.node;
+
   // check if missing this transform
-  if (!( node.node in transforms )) {
-    console.log(`Missing ${ node.node } at ${ $depth }`);
+  if (!( type in transforms )) {
+    console.log(`Missing ${ type } at ${ $depth }`);
     return;
   }
 
   // find the transform to use
-  const transform = transforms[ node.node ];
+  const transform = transforms[ type ];
 
   // apply the transformation
   $depth++;
-  notifyListeners( node.node, 'beforeTransform', transform, $depth );
+
+  // perform the transformation
+  notifyListeners( type, 'beforeTransform', transform, $depth );
   const transformed = applyTransformation( transform, node );
-  notifyListeners( node.node, 'afterTransform', transformed, $depth );
+  notifyListeners( type, 'afterTransform', transformed, $depth );
 
   // move back up
   --$depth;
@@ -91,6 +94,43 @@ export function generateSimpleName( name ) {
 
 export function generateThisExpression() {
   return { type: 'ThisExpression' };
+}
+
+
+export function generateAssignmentExpression( assignTo, value ) {
+  return {
+    type: 'ExpressionStatement',
+    expression: {
+      type: 'AssignmentExpression',
+      operator: '=',
+      left: transformAST( assignTo ),
+      right: transformAST( value || { node: 'NullLiteral' })
+    }
+  };
+}
+
+export function generateMethod( name, args, body ) {
+  return {
+    type: 'MethodDefinition',
+    key: {
+      type: 'Identifier',
+      name: name
+    },
+    computed: false,
+    value: {
+      type: 'FunctionExpression',
+      id: null,
+      params: _.map( args, generateSimpleName ),
+      body: {
+        type: 'BlockStatement',
+        body: body //  transformAST( body ) || [ ]
+      },
+      generator: false,
+      expression: false
+    },
+    kind: 'method',
+    static: false
+  };
 }
 
 // adds an object to listen for events
