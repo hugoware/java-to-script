@@ -4,10 +4,18 @@
     {
       "node": "TypeDeclaration",
       "name": {
-        "identifier": "Test",
+        "identifier": "AreaIterator",
         "node": "SimpleName"
       },
-      "superInterfaceTypes": [],
+      "superInterfaceTypes": [
+        {
+          "node": "SimpleType",
+          "name": {
+            "identifier": "PathIterator",
+            "node": "SimpleName"
+          }
+        }
+      ],
       "superclassType": null,
       "bodyDeclarations": [
         {
@@ -16,7 +24,61 @@
             {
               "node": "VariableDeclarationFragment",
               "name": {
-                "identifier": "test",
+                "identifier": "transform",
+                "node": "SimpleName"
+              },
+              "extraDimensions": 0,
+              "initializer": null
+            }
+          ],
+          "type": {
+            "node": "SimpleType",
+            "name": {
+              "identifier": "AffineTransform",
+              "node": "SimpleName"
+            }
+          },
+          "modifiers": [
+            {
+              "node": "Modifier",
+              "keyword": "private"
+            }
+          ]
+        },
+        {
+          "node": "FieldDeclaration",
+          "fragments": [
+            {
+              "node": "VariableDeclarationFragment",
+              "name": {
+                "identifier": "curves",
+                "node": "SimpleName"
+              },
+              "extraDimensions": 0,
+              "initializer": null
+            }
+          ],
+          "type": {
+            "node": "SimpleType",
+            "name": {
+              "identifier": "Vector",
+              "node": "SimpleName"
+            }
+          },
+          "modifiers": [
+            {
+              "node": "Modifier",
+              "keyword": "private"
+            }
+          ]
+        },
+        {
+          "node": "FieldDeclaration",
+          "fragments": [
+            {
+              "node": "VariableDeclarationFragment",
+              "name": {
+                "identifier": "index",
                 "node": "SimpleName"
               },
               "extraDimensions": 0,
@@ -30,7 +92,61 @@
           "modifiers": [
             {
               "node": "Modifier",
-              "keyword": "public"
+              "keyword": "private"
+            }
+          ]
+        },
+        {
+          "node": "FieldDeclaration",
+          "fragments": [
+            {
+              "node": "VariableDeclarationFragment",
+              "name": {
+                "identifier": "prevcurve",
+                "node": "SimpleName"
+              },
+              "extraDimensions": 0,
+              "initializer": null
+            }
+          ],
+          "type": {
+            "node": "SimpleType",
+            "name": {
+              "identifier": "Curve",
+              "node": "SimpleName"
+            }
+          },
+          "modifiers": [
+            {
+              "node": "Modifier",
+              "keyword": "private"
+            }
+          ]
+        },
+        {
+          "node": "FieldDeclaration",
+          "fragments": [
+            {
+              "node": "VariableDeclarationFragment",
+              "name": {
+                "identifier": "thiscurve",
+                "node": "SimpleName"
+              },
+              "extraDimensions": 0,
+              "initializer": null
+            }
+          ],
+          "type": {
+            "node": "SimpleType",
+            "name": {
+              "identifier": "Curve",
+              "node": "SimpleName"
+            }
+          },
+          "modifiers": [
+            {
+              "node": "Modifier",
+              "keyword": "private"
             }
           ]
         },
@@ -39,13 +155,16 @@
             {
               "node": "SingleVariableDeclaration",
               "name": {
-                "identifier": "a",
+                "identifier": "curves",
                 "node": "SimpleName"
               },
               "extraDimensions": 0,
               "type": {
-                "node": "PrimitiveType",
-                "primitiveTypeCode": "int"
+                "node": "SimpleType",
+                "name": {
+                  "identifier": "Vector",
+                  "node": "SimpleName"
+                }
               },
               "modifiers": [],
               "varargs": false,
@@ -54,28 +173,16 @@
             {
               "node": "SingleVariableDeclaration",
               "name": {
-                "identifier": "b",
+                "identifier": "at",
                 "node": "SimpleName"
               },
               "extraDimensions": 0,
               "type": {
-                "node": "PrimitiveType",
-                "primitiveTypeCode": "int"
-              },
-              "modifiers": [],
-              "varargs": false,
-              "initializer": null
-            },
-            {
-              "node": "SingleVariableDeclaration",
-              "name": {
-                "identifier": "test",
-                "node": "SimpleName"
-              },
-              "extraDimensions": 0,
-              "type": {
-                "node": "PrimitiveType",
-                "primitiveTypeCode": "int"
+                "node": "SimpleType",
+                "name": {
+                  "identifier": "AffineTransform",
+                  "node": "SimpleName"
+                }
               },
               "modifiers": [],
               "varargs": false,
@@ -94,7 +201,7 @@
                   "leftHandSide": {
                     "node": "FieldAccess",
                     "name": {
-                      "identifier": "out",
+                      "identifier": "curves",
                       "node": "SimpleName"
                     },
                     "expression": {
@@ -103,7 +210,8 @@
                     }
                   },
                   "rightHandSide": {
-                    "node": "NullLiteral"
+                    "identifier": "curves",
+                    "node": "SimpleName"
                   }
                 }
               },
@@ -115,7 +223,7 @@
                   "leftHandSide": {
                     "node": "FieldAccess",
                     "name": {
-                      "identifier": "test",
+                      "identifier": "transform",
                       "node": "SimpleName"
                     },
                     "expression": {
@@ -124,55 +232,457 @@
                     }
                   },
                   "rightHandSide": {
-                    "node": "InfixExpression",
-                    "operator": "+",
-                    "leftOperand": {
-                      "identifier": "test",
-                      "node": "SimpleName"
-                    },
-                    "rightOperand": {
-                      "identifier": "c",
-                      "node": "SimpleName"
-                    }
+                    "identifier": "at",
+                    "node": "SimpleName"
                   }
                 }
               },
               {
-                "node": "ExpressionStatement",
+                "node": "IfStatement",
+                "elseStatement": null,
+                "thenStatement": {
+                  "node": "Block",
+                  "statements": [
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "node": "Assignment",
+                        "operator": "=",
+                        "leftHandSide": {
+                          "identifier": "thiscurve",
+                          "node": "SimpleName"
+                        },
+                        "rightHandSide": {
+                          "node": "CastExpression",
+                          "type": {
+                            "node": "SimpleType",
+                            "name": {
+                              "identifier": "Curve",
+                              "node": "SimpleName"
+                            }
+                          },
+                          "expression": {
+                            "name": {
+                              "identifier": "get",
+                              "node": "SimpleName"
+                            },
+                            "expression": {
+                              "identifier": "curves",
+                              "node": "SimpleName"
+                            },
+                            "node": "MethodInvocation",
+                            "arguments": [
+                              {
+                                "node": "NumberLiteral",
+                                "token": "0"
+                              }
+                            ],
+                            "typeArguments": []
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
                 "expression": {
-                  "name": {
-                    "identifier": "rest",
-                    "node": "SimpleName"
-                  },
-                  "expression": {
-                    "identifier": "alt",
-                    "node": "SimpleName"
-                  },
-                  "node": "MethodInvocation",
-                  "arguments": [],
-                  "typeArguments": []
-                }
-              },
-              {
-                "node": "ExpressionStatement",
-                "expression": {
-                  "node": "Assignment",
-                  "operator": "=",
-                  "leftHandSide": {
-                    "identifier": "c",
-                    "node": "SimpleName"
-                  },
-                  "rightHandSide": {
-                    "node": "InfixExpression",
-                    "operator": "+",
-                    "leftOperand": {
-                      "identifier": "a",
+                  "node": "InfixExpression",
+                  "operator": ">=",
+                  "leftOperand": {
+                    "name": {
+                      "identifier": "size",
                       "node": "SimpleName"
                     },
-                    "rightOperand": {
-                      "identifier": "b",
+                    "expression": {
+                      "identifier": "curves",
                       "node": "SimpleName"
+                    },
+                    "node": "MethodInvocation",
+                    "arguments": [],
+                    "typeArguments": []
+                  },
+                  "rightOperand": {
+                    "node": "NumberLiteral",
+                    "token": "1"
+                  }
+                }
+              }
+            ]
+          },
+          "returnType2": null,
+          "constructor": true,
+          "extraDimensions": 0,
+          "node": "MethodDeclaration",
+          "name": {
+            "identifier": "AreaIterator",
+            "node": "SimpleName"
+          },
+          "typeParameters": [],
+          "modifiers": [
+            {
+              "node": "Modifier",
+              "keyword": "public"
+            }
+          ]
+        },
+        {
+          "parameters": [],
+          "thrownExceptions": [],
+          "extraDimensions": 0,
+          "body": {
+            "node": "Block",
+            "statements": [
+              {
+                "node": "ReturnStatement",
+                "expression": {
+                  "identifier": "WIND_NON_ZERO",
+                  "node": "SimpleName"
+                }
+              }
+            ]
+          },
+          "constructor": false,
+          "node": "MethodDeclaration",
+          "returnType2": {
+            "node": "PrimitiveType",
+            "primitiveTypeCode": "int"
+          },
+          "name": {
+            "identifier": "getWindingRule",
+            "node": "SimpleName"
+          },
+          "typeParameters": [],
+          "modifiers": [
+            {
+              "node": "Modifier",
+              "keyword": "public"
+            }
+          ]
+        },
+        {
+          "parameters": [],
+          "thrownExceptions": [],
+          "extraDimensions": 0,
+          "body": {
+            "node": "Block",
+            "statements": [
+              {
+                "node": "ReturnStatement",
+                "expression": {
+                  "node": "ParenthesizedExpression",
+                  "expression": {
+                    "node": "InfixExpression",
+                    "operator": "&&",
+                    "leftOperand": {
+                      "node": "InfixExpression",
+                      "operator": "==",
+                      "leftOperand": {
+                        "identifier": "prevcurve",
+                        "node": "SimpleName"
+                      },
+                      "rightOperand": {
+                        "node": "NullLiteral"
+                      }
+                    },
+                    "rightOperand": {
+                      "node": "InfixExpression",
+                      "operator": "==",
+                      "leftOperand": {
+                        "identifier": "thiscurve",
+                        "node": "SimpleName"
+                      },
+                      "rightOperand": {
+                        "node": "NullLiteral"
+                      }
                     }
+                  }
+                }
+              }
+            ]
+          },
+          "constructor": false,
+          "node": "MethodDeclaration",
+          "returnType2": {
+            "node": "PrimitiveType",
+            "primitiveTypeCode": "boolean"
+          },
+          "name": {
+            "identifier": "isDone",
+            "node": "SimpleName"
+          },
+          "typeParameters": [],
+          "modifiers": [
+            {
+              "node": "Modifier",
+              "keyword": "public"
+            }
+          ]
+        },
+        {
+          "parameters": [],
+          "thrownExceptions": [],
+          "body": {
+            "node": "Block",
+            "statements": [
+              {
+                "node": "IfStatement",
+                "elseStatement": {
+                  "node": "Block",
+                  "statements": [
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "node": "Assignment",
+                        "operator": "=",
+                        "leftHandSide": {
+                          "identifier": "prevcurve",
+                          "node": "SimpleName"
+                        },
+                        "rightHandSide": {
+                          "identifier": "thiscurve",
+                          "node": "SimpleName"
+                        }
+                      }
+                    },
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "node": "PostfixExpression",
+                        "operator": "++",
+                        "operand": {
+                          "identifier": "index",
+                          "node": "SimpleName"
+                        }
+                      }
+                    },
+                    {
+                      "node": "IfStatement",
+                      "elseStatement": {
+                        "node": "Block",
+                        "statements": [
+                          {
+                            "node": "ExpressionStatement",
+                            "expression": {
+                              "node": "Assignment",
+                              "operator": "=",
+                              "leftHandSide": {
+                                "identifier": "thiscurve",
+                                "node": "SimpleName"
+                              },
+                              "rightHandSide": {
+                                "node": "NullLiteral"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "thenStatement": {
+                        "node": "Block",
+                        "statements": [
+                          {
+                            "node": "ExpressionStatement",
+                            "expression": {
+                              "node": "Assignment",
+                              "operator": "=",
+                              "leftHandSide": {
+                                "identifier": "thiscurve",
+                                "node": "SimpleName"
+                              },
+                              "rightHandSide": {
+                                "node": "CastExpression",
+                                "type": {
+                                  "node": "SimpleType",
+                                  "name": {
+                                    "identifier": "Curve",
+                                    "node": "SimpleName"
+                                  }
+                                },
+                                "expression": {
+                                  "name": {
+                                    "identifier": "get",
+                                    "node": "SimpleName"
+                                  },
+                                  "expression": {
+                                    "identifier": "curves",
+                                    "node": "SimpleName"
+                                  },
+                                  "node": "MethodInvocation",
+                                  "arguments": [
+                                    {
+                                      "identifier": "index",
+                                      "node": "SimpleName"
+                                    }
+                                  ],
+                                  "typeArguments": []
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "node": "IfStatement",
+                            "elseStatement": null,
+                            "thenStatement": {
+                              "node": "Block",
+                              "statements": [
+                                {
+                                  "node": "ExpressionStatement",
+                                  "expression": {
+                                    "node": "Assignment",
+                                    "operator": "=",
+                                    "leftHandSide": {
+                                      "identifier": "prevcurve",
+                                      "node": "SimpleName"
+                                    },
+                                    "rightHandSide": {
+                                      "node": "NullLiteral"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            "expression": {
+                              "node": "InfixExpression",
+                              "operator": "&&",
+                              "leftOperand": {
+                                "node": "InfixExpression",
+                                "operator": "&&",
+                                "leftOperand": {
+                                  "node": "InfixExpression",
+                                  "operator": "!=",
+                                  "leftOperand": {
+                                    "name": {
+                                      "identifier": "getOrder",
+                                      "node": "SimpleName"
+                                    },
+                                    "expression": {
+                                      "identifier": "thiscurve",
+                                      "node": "SimpleName"
+                                    },
+                                    "node": "MethodInvocation",
+                                    "arguments": [],
+                                    "typeArguments": []
+                                  },
+                                  "rightOperand": {
+                                    "node": "NumberLiteral",
+                                    "token": "0"
+                                  }
+                                },
+                                "rightOperand": {
+                                  "node": "InfixExpression",
+                                  "operator": "==",
+                                  "leftOperand": {
+                                    "name": {
+                                      "identifier": "getX1",
+                                      "node": "SimpleName"
+                                    },
+                                    "expression": {
+                                      "identifier": "prevcurve",
+                                      "node": "SimpleName"
+                                    },
+                                    "node": "MethodInvocation",
+                                    "arguments": [],
+                                    "typeArguments": []
+                                  },
+                                  "rightOperand": {
+                                    "name": {
+                                      "identifier": "getX0",
+                                      "node": "SimpleName"
+                                    },
+                                    "expression": {
+                                      "identifier": "thiscurve",
+                                      "node": "SimpleName"
+                                    },
+                                    "node": "MethodInvocation",
+                                    "arguments": [],
+                                    "typeArguments": []
+                                  }
+                                }
+                              },
+                              "rightOperand": {
+                                "node": "InfixExpression",
+                                "operator": "==",
+                                "leftOperand": {
+                                  "name": {
+                                    "identifier": "getY1",
+                                    "node": "SimpleName"
+                                  },
+                                  "expression": {
+                                    "identifier": "prevcurve",
+                                    "node": "SimpleName"
+                                  },
+                                  "node": "MethodInvocation",
+                                  "arguments": [],
+                                  "typeArguments": []
+                                },
+                                "rightOperand": {
+                                  "name": {
+                                    "identifier": "getY0",
+                                    "node": "SimpleName"
+                                  },
+                                  "expression": {
+                                    "identifier": "thiscurve",
+                                    "node": "SimpleName"
+                                  },
+                                  "node": "MethodInvocation",
+                                  "arguments": [],
+                                  "typeArguments": []
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "expression": {
+                        "node": "InfixExpression",
+                        "operator": "<",
+                        "leftOperand": {
+                          "identifier": "index",
+                          "node": "SimpleName"
+                        },
+                        "rightOperand": {
+                          "name": {
+                            "identifier": "size",
+                            "node": "SimpleName"
+                          },
+                          "expression": {
+                            "identifier": "curves",
+                            "node": "SimpleName"
+                          },
+                          "node": "MethodInvocation",
+                          "arguments": [],
+                          "typeArguments": []
+                        }
+                      }
+                    }
+                  ]
+                },
+                "thenStatement": {
+                  "node": "Block",
+                  "statements": [
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "node": "Assignment",
+                        "operator": "=",
+                        "leftHandSide": {
+                          "identifier": "prevcurve",
+                          "node": "SimpleName"
+                        },
+                        "rightHandSide": {
+                          "node": "NullLiteral"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "expression": {
+                  "node": "InfixExpression",
+                  "operator": "!=",
+                  "leftOperand": {
+                    "identifier": "prevcurve",
+                    "node": "SimpleName"
+                  },
+                  "rightOperand": {
+                    "node": "NullLiteral"
                   }
                 }
               }
@@ -186,10 +696,757 @@
             "primitiveTypeCode": "void"
           },
           "name": {
-            "identifier": "replace",
+            "identifier": "next",
             "node": "SimpleName"
           },
           "constructor": false,
+          "modifiers": [
+            {
+              "node": "Modifier",
+              "keyword": "public"
+            }
+          ]
+        },
+        {
+          "parameters": [
+            {
+              "node": "SingleVariableDeclaration",
+              "name": {
+                "identifier": "coords",
+                "node": "SimpleName"
+              },
+              "extraDimensions": 1,
+              "type": {
+                "node": "PrimitiveType",
+                "primitiveTypeCode": "float"
+              },
+              "modifiers": [],
+              "varargs": false,
+              "initializer": null
+            }
+          ],
+          "thrownExceptions": [],
+          "extraDimensions": 0,
+          "body": {
+            "node": "Block",
+            "statements": [
+              {
+                "node": "VariableDeclarationStatement",
+                "fragments": [
+                  {
+                    "node": "VariableDeclarationFragment",
+                    "name": {
+                      "identifier": "dcoords",
+                      "node": "SimpleName"
+                    },
+                    "extraDimensions": 1,
+                    "initializer": {
+                      "node": "ArrayCreation",
+                      "type": {
+                        "node": "ArrayType",
+                        "componentType": {
+                          "node": "PrimitiveType",
+                          "primitiveTypeCode": "double"
+                        }
+                      },
+                      "initializer": null,
+                      "dimensions": [
+                        {
+                          "node": "NumberLiteral",
+                          "token": "6"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "modifiers": [],
+                "type": {
+                  "node": "PrimitiveType",
+                  "primitiveTypeCode": "double"
+                }
+              },
+              {
+                "node": "VariableDeclarationStatement",
+                "fragments": [
+                  {
+                    "node": "VariableDeclarationFragment",
+                    "name": {
+                      "identifier": "segtype",
+                      "node": "SimpleName"
+                    },
+                    "extraDimensions": 0,
+                    "initializer": {
+                      "name": {
+                        "identifier": "currentSegment",
+                        "node": "SimpleName"
+                      },
+                      "expression": null,
+                      "node": "MethodInvocation",
+                      "arguments": [
+                        {
+                          "identifier": "dcoords",
+                          "node": "SimpleName"
+                        }
+                      ],
+                      "typeArguments": []
+                    }
+                  }
+                ],
+                "modifiers": [],
+                "type": {
+                  "node": "PrimitiveType",
+                  "primitiveTypeCode": "int"
+                }
+              },
+              {
+                "node": "VariableDeclarationStatement",
+                "fragments": [
+                  {
+                    "node": "VariableDeclarationFragment",
+                    "name": {
+                      "identifier": "numpoints",
+                      "node": "SimpleName"
+                    },
+                    "extraDimensions": 0,
+                    "initializer": {
+                      "node": "ParenthesizedExpression",
+                      "expression": {
+                        "node": "ConditionalExpression",
+                        "expression": {
+                          "node": "InfixExpression",
+                          "operator": "==",
+                          "leftOperand": {
+                            "identifier": "segtype",
+                            "node": "SimpleName"
+                          },
+                          "rightOperand": {
+                            "identifier": "SEG_CLOSE",
+                            "node": "SimpleName"
+                          }
+                        },
+                        "thenExpression": {
+                          "node": "NumberLiteral",
+                          "token": "0"
+                        },
+                        "elseExpression": {
+                          "node": "ParenthesizedExpression",
+                          "expression": {
+                            "node": "ConditionalExpression",
+                            "expression": {
+                              "node": "InfixExpression",
+                              "operator": "==",
+                              "leftOperand": {
+                                "identifier": "segtype",
+                                "node": "SimpleName"
+                              },
+                              "rightOperand": {
+                                "identifier": "SEG_QUADTO",
+                                "node": "SimpleName"
+                              }
+                            },
+                            "thenExpression": {
+                              "node": "NumberLiteral",
+                              "token": "2"
+                            },
+                            "elseExpression": {
+                              "node": "ParenthesizedExpression",
+                              "expression": {
+                                "node": "ConditionalExpression",
+                                "expression": {
+                                  "node": "InfixExpression",
+                                  "operator": "==",
+                                  "leftOperand": {
+                                    "identifier": "segtype",
+                                    "node": "SimpleName"
+                                  },
+                                  "rightOperand": {
+                                    "identifier": "SEG_CUBICTO",
+                                    "node": "SimpleName"
+                                  }
+                                },
+                                "thenExpression": {
+                                  "node": "NumberLiteral",
+                                  "token": "3"
+                                },
+                                "elseExpression": {
+                                  "node": "NumberLiteral",
+                                  "token": "1"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "modifiers": [],
+                "type": {
+                  "node": "PrimitiveType",
+                  "primitiveTypeCode": "int"
+                }
+              },
+              {
+                "node": "ForStatement",
+                "initializers": [
+                  {
+                    "node": "VariableDeclarationExpression",
+                    "modifiers": [],
+                    "fragments": [
+                      {
+                        "node": "VariableDeclarationFragment",
+                        "name": {
+                          "identifier": "i",
+                          "node": "SimpleName"
+                        },
+                        "extraDimensions": 0,
+                        "initializer": {
+                          "node": "NumberLiteral",
+                          "token": "0"
+                        }
+                      }
+                    ],
+                    "type": {
+                      "node": "PrimitiveType",
+                      "primitiveTypeCode": "int"
+                    }
+                  }
+                ],
+                "expression": {
+                  "node": "InfixExpression",
+                  "operator": "<",
+                  "leftOperand": {
+                    "identifier": "i",
+                    "node": "SimpleName"
+                  },
+                  "rightOperand": {
+                    "node": "InfixExpression",
+                    "operator": "*",
+                    "leftOperand": {
+                      "identifier": "numpoints",
+                      "node": "SimpleName"
+                    },
+                    "rightOperand": {
+                      "node": "NumberLiteral",
+                      "token": "2"
+                    }
+                  }
+                },
+                "updaters": [
+                  {
+                    "node": "PostfixExpression",
+                    "operator": "++",
+                    "operand": {
+                      "identifier": "i",
+                      "node": "SimpleName"
+                    }
+                  }
+                ],
+                "body": {
+                  "node": "Block",
+                  "statements": [
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "node": "Assignment",
+                        "operator": "=",
+                        "leftHandSide": {
+                          "node": "ArrayAccess",
+                          "array": {
+                            "identifier": "coords",
+                            "node": "SimpleName"
+                          },
+                          "index": {
+                            "identifier": "i",
+                            "node": "SimpleName"
+                          }
+                        },
+                        "rightHandSide": {
+                          "node": "CastExpression",
+                          "type": {
+                            "node": "PrimitiveType",
+                            "primitiveTypeCode": "float"
+                          },
+                          "expression": {
+                            "node": "ArrayAccess",
+                            "array": {
+                              "identifier": "dcoords",
+                              "node": "SimpleName"
+                            },
+                            "index": {
+                              "identifier": "i",
+                              "node": "SimpleName"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "node": "ReturnStatement",
+                "expression": {
+                  "identifier": "segtype",
+                  "node": "SimpleName"
+                }
+              }
+            ]
+          },
+          "constructor": false,
+          "node": "MethodDeclaration",
+          "returnType2": {
+            "node": "PrimitiveType",
+            "primitiveTypeCode": "int"
+          },
+          "name": {
+            "identifier": "currentSegment",
+            "node": "SimpleName"
+          },
+          "typeParameters": [],
+          "modifiers": [
+            {
+              "node": "Modifier",
+              "keyword": "public"
+            }
+          ]
+        },
+        {
+          "parameters": [
+            {
+              "node": "SingleVariableDeclaration",
+              "name": {
+                "identifier": "coords",
+                "node": "SimpleName"
+              },
+              "extraDimensions": 1,
+              "type": {
+                "node": "PrimitiveType",
+                "primitiveTypeCode": "double"
+              },
+              "modifiers": [],
+              "varargs": false,
+              "initializer": null
+            }
+          ],
+          "thrownExceptions": [],
+          "extraDimensions": 0,
+          "body": {
+            "node": "Block",
+            "statements": [
+              {
+                "node": "VariableDeclarationStatement",
+                "fragments": [
+                  {
+                    "node": "VariableDeclarationFragment",
+                    "name": {
+                      "identifier": "segtype",
+                      "node": "SimpleName"
+                    },
+                    "extraDimensions": 0,
+                    "initializer": null
+                  }
+                ],
+                "modifiers": [],
+                "type": {
+                  "node": "PrimitiveType",
+                  "primitiveTypeCode": "int"
+                }
+              },
+              {
+                "node": "VariableDeclarationStatement",
+                "fragments": [
+                  {
+                    "node": "VariableDeclarationFragment",
+                    "name": {
+                      "identifier": "numpoints",
+                      "node": "SimpleName"
+                    },
+                    "extraDimensions": 0,
+                    "initializer": null
+                  }
+                ],
+                "modifiers": [],
+                "type": {
+                  "node": "PrimitiveType",
+                  "primitiveTypeCode": "int"
+                }
+              },
+              {
+                "node": "IfStatement",
+                "elseStatement": {
+                  "node": "IfStatement",
+                  "elseStatement": {
+                    "node": "Block",
+                    "statements": [
+                      {
+                        "node": "ExpressionStatement",
+                        "expression": {
+                          "node": "Assignment",
+                          "operator": "=",
+                          "leftHandSide": {
+                            "identifier": "segtype",
+                            "node": "SimpleName"
+                          },
+                          "rightHandSide": {
+                            "name": {
+                              "identifier": "getSegment",
+                              "node": "SimpleName"
+                            },
+                            "expression": {
+                              "identifier": "thiscurve",
+                              "node": "SimpleName"
+                            },
+                            "node": "MethodInvocation",
+                            "arguments": [
+                              {
+                                "identifier": "coords",
+                                "node": "SimpleName"
+                              }
+                            ],
+                            "typeArguments": []
+                          }
+                        }
+                      },
+                      {
+                        "node": "ExpressionStatement",
+                        "expression": {
+                          "node": "Assignment",
+                          "operator": "=",
+                          "leftHandSide": {
+                            "identifier": "numpoints",
+                            "node": "SimpleName"
+                          },
+                          "rightHandSide": {
+                            "name": {
+                              "identifier": "getOrder",
+                              "node": "SimpleName"
+                            },
+                            "expression": {
+                              "identifier": "thiscurve",
+                              "node": "SimpleName"
+                            },
+                            "node": "MethodInvocation",
+                            "arguments": [],
+                            "typeArguments": []
+                          }
+                        }
+                      },
+                      {
+                        "node": "IfStatement",
+                        "elseStatement": null,
+                        "thenStatement": {
+                          "node": "Block",
+                          "statements": [
+                            {
+                              "node": "ExpressionStatement",
+                              "expression": {
+                                "node": "Assignment",
+                                "operator": "=",
+                                "leftHandSide": {
+                                  "identifier": "numpoints",
+                                  "node": "SimpleName"
+                                },
+                                "rightHandSide": {
+                                  "node": "NumberLiteral",
+                                  "token": "1"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "expression": {
+                          "node": "InfixExpression",
+                          "operator": "==",
+                          "leftOperand": {
+                            "identifier": "numpoints",
+                            "node": "SimpleName"
+                          },
+                          "rightOperand": {
+                            "node": "NumberLiteral",
+                            "token": "0"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "thenStatement": {
+                    "node": "Block",
+                    "statements": [
+                      {
+                        "node": "ThrowStatement",
+                        "expression": {
+                          "arguments": [
+                            {
+                              "node": "StringLiteral",
+                              "escapedValue": "\"area iterator out of bounds\""
+                            }
+                          ],
+                          "anonymousClassDeclaration": null,
+                          "node": "ClassInstanceCreation",
+                          "type": {
+                            "node": "SimpleType",
+                            "name": {
+                              "identifier": "NoSuchElementException",
+                              "node": "SimpleName"
+                            }
+                          },
+                          "typeArguments": [],
+                          "expression": null
+                        }
+                      }
+                    ]
+                  },
+                  "expression": {
+                    "node": "InfixExpression",
+                    "operator": "==",
+                    "leftOperand": {
+                      "identifier": "thiscurve",
+                      "node": "SimpleName"
+                    },
+                    "rightOperand": {
+                      "node": "NullLiteral"
+                    }
+                  }
+                },
+                "thenStatement": {
+                  "node": "Block",
+                  "statements": [
+                    {
+                      "node": "IfStatement",
+                      "elseStatement": null,
+                      "thenStatement": {
+                        "node": "Block",
+                        "statements": [
+                          {
+                            "node": "ReturnStatement",
+                            "expression": {
+                              "identifier": "SEG_CLOSE",
+                              "node": "SimpleName"
+                            }
+                          }
+                        ]
+                      },
+                      "expression": {
+                        "node": "InfixExpression",
+                        "operator": "||",
+                        "leftOperand": {
+                          "node": "InfixExpression",
+                          "operator": "==",
+                          "leftOperand": {
+                            "identifier": "thiscurve",
+                            "node": "SimpleName"
+                          },
+                          "rightOperand": {
+                            "node": "NullLiteral"
+                          }
+                        },
+                        "rightOperand": {
+                          "node": "InfixExpression",
+                          "operator": "==",
+                          "leftOperand": {
+                            "name": {
+                              "identifier": "getOrder",
+                              "node": "SimpleName"
+                            },
+                            "expression": {
+                              "identifier": "thiscurve",
+                              "node": "SimpleName"
+                            },
+                            "node": "MethodInvocation",
+                            "arguments": [],
+                            "typeArguments": []
+                          },
+                          "rightOperand": {
+                            "node": "NumberLiteral",
+                            "token": "0"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "node": "Assignment",
+                        "operator": "=",
+                        "leftHandSide": {
+                          "node": "ArrayAccess",
+                          "array": {
+                            "identifier": "coords",
+                            "node": "SimpleName"
+                          },
+                          "index": {
+                            "node": "NumberLiteral",
+                            "token": "0"
+                          }
+                        },
+                        "rightHandSide": {
+                          "name": {
+                            "identifier": "getX0",
+                            "node": "SimpleName"
+                          },
+                          "expression": {
+                            "identifier": "thiscurve",
+                            "node": "SimpleName"
+                          },
+                          "node": "MethodInvocation",
+                          "arguments": [],
+                          "typeArguments": []
+                        }
+                      }
+                    },
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "node": "Assignment",
+                        "operator": "=",
+                        "leftHandSide": {
+                          "node": "ArrayAccess",
+                          "array": {
+                            "identifier": "coords",
+                            "node": "SimpleName"
+                          },
+                          "index": {
+                            "node": "NumberLiteral",
+                            "token": "1"
+                          }
+                        },
+                        "rightHandSide": {
+                          "name": {
+                            "identifier": "getY0",
+                            "node": "SimpleName"
+                          },
+                          "expression": {
+                            "identifier": "thiscurve",
+                            "node": "SimpleName"
+                          },
+                          "node": "MethodInvocation",
+                          "arguments": [],
+                          "typeArguments": []
+                        }
+                      }
+                    },
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "node": "Assignment",
+                        "operator": "=",
+                        "leftHandSide": {
+                          "identifier": "segtype",
+                          "node": "SimpleName"
+                        },
+                        "rightHandSide": {
+                          "identifier": "SEG_LINETO",
+                          "node": "SimpleName"
+                        }
+                      }
+                    },
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "node": "Assignment",
+                        "operator": "=",
+                        "leftHandSide": {
+                          "identifier": "numpoints",
+                          "node": "SimpleName"
+                        },
+                        "rightHandSide": {
+                          "node": "NumberLiteral",
+                          "token": "1"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "expression": {
+                  "node": "InfixExpression",
+                  "operator": "!=",
+                  "leftOperand": {
+                    "identifier": "prevcurve",
+                    "node": "SimpleName"
+                  },
+                  "rightOperand": {
+                    "node": "NullLiteral"
+                  }
+                }
+              },
+              {
+                "node": "IfStatement",
+                "elseStatement": null,
+                "thenStatement": {
+                  "node": "Block",
+                  "statements": [
+                    {
+                      "node": "ExpressionStatement",
+                      "expression": {
+                        "name": {
+                          "identifier": "transform",
+                          "node": "SimpleName"
+                        },
+                        "expression": {
+                          "identifier": "transform",
+                          "node": "SimpleName"
+                        },
+                        "node": "MethodInvocation",
+                        "arguments": [
+                          {
+                            "identifier": "coords",
+                            "node": "SimpleName"
+                          },
+                          {
+                            "node": "NumberLiteral",
+                            "token": "0"
+                          },
+                          {
+                            "identifier": "coords",
+                            "node": "SimpleName"
+                          },
+                          {
+                            "node": "NumberLiteral",
+                            "token": "0"
+                          },
+                          {
+                            "identifier": "numpoints",
+                            "node": "SimpleName"
+                          }
+                        ],
+                        "typeArguments": []
+                      }
+                    }
+                  ]
+                },
+                "expression": {
+                  "node": "InfixExpression",
+                  "operator": "!=",
+                  "leftOperand": {
+                    "identifier": "transform",
+                    "node": "SimpleName"
+                  },
+                  "rightOperand": {
+                    "node": "NullLiteral"
+                  }
+                }
+              },
+              {
+                "node": "ReturnStatement",
+                "expression": {
+                  "identifier": "segtype",
+                  "node": "SimpleName"
+                }
+              }
+            ]
+          },
+          "constructor": false,
+          "node": "MethodDeclaration",
+          "returnType2": {
+            "node": "PrimitiveType",
+            "primitiveTypeCode": "int"
+          },
+          "name": {
+            "identifier": "currentSegment",
+            "node": "SimpleName"
+          },
+          "typeParameters": [],
           "modifiers": [
             {
               "node": "Modifier",
@@ -200,12 +1457,7 @@
       ],
       "typeParameters": [],
       "interface": false,
-      "modifiers": [
-        {
-          "node": "Modifier",
-          "keyword": "public"
-        }
-      ]
+      "modifiers": []
     }
   ],
   "package": null,

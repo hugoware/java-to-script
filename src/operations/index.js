@@ -58,6 +58,16 @@ export function findOfType( ast, type, matches ) {
 }
 
 
+// locates a parent of a specific type
+export function findParentOfType( ast, find, type ) {
+  let parent = findParent( ast, find );
+  while ( parent ) {
+    if ( parent.type === type ) return parent;
+    parent = findParent( ast, parent );
+  }
+}
+
+
 // track the last 'type' scope while searching for
 // parents since in most cases you're interested
 // in the entire definition, not just the child property

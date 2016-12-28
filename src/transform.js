@@ -133,6 +133,23 @@ export function generateMethod( name, args, body ) {
   };
 }
 
+export function generateFunction( name, args, body ) {
+  return {
+    type: 'FunctionDeclaration',
+    id: {
+      type: 'Identifier',
+      name: name
+    },
+    params: _.map( args, generateSimpleName ),
+    generator: false,
+    expression: false,
+    body: {
+      type: 'BlockStatement',
+      body: body
+    }
+  };
+}
+
 // adds an object to listen for events
 export function addListener( type, actions ) {
   if ( _.isFunction( actions ))
